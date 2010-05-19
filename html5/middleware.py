@@ -1,10 +1,20 @@
 import re
 from django.conf import settings
 
+try:
+    from threading import local
+except ImportError:
+    from django.utils._threading_local import local
+
 EXP_CHROME = re.compile('.* Chrome/(\d)\..*')
 EXP_FIREFOX = re.compile('.* Firefox/(\d\.\d)\..*')
 EXP_SAFARI = re.compile('.*/(\d+\.\d+)[\.\d]* Safari/.*')
 EXP_OPERA = re.compile('^Opera/(\d)\..*')
+EXP_IE = re.compile('.* MSIE (\d\.\d).*')
+
+_thread_locals = local()
+def current_request_supports_html5():
+    return getattr(_thread_locals, 'supports_html5', None)
 
 class HTML5Middleware(object):
     """Detects browser supports HTML5 features and sets a boolean attribute 'Request.supports_html5'.
@@ -37,6 +47,11 @@ class HTML5Middleware(object):
         if m and float(m.group(1)) >= 10:
             request.supports_html5 = True
 
-        # Just to debug
-        #if not request.supports_html5:
-        #    raise Exception(request.META)
+        # Stores in thread locals
+        _thread_locals.supports_html5 = request.supports_html5
+
+        # Check if current browser is MS Internet Explorer
+        m = EXP_IE.match(request.META['HTTP_USER_AGENT'])
+        request.is_ie = bool(m)
+        request.is_bad_ie = bool(m and float(m.group(1)) < 8)
+

@@ -4,6 +4,9 @@ Features:
 - Form fields and widgets for HTML5 input types.
 - Javascript fallback for autofocus attribute of inputs if you want it. As seen here: http://diveintohtml5.org/forms.html
 
-
-
+Features added by Marinho Brandao on his fork:
+- Middleware to check if current browser supports HTML5 and set it to attribute
+  'request.supports_html5'
+- Monkey patch to replace function 'find_template' to find for '.html5' instead of '.html'
+  as priority
 
