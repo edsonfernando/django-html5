@@ -29,6 +29,10 @@ class HTML5Middleware(object):
         # Default is False
         request.supports_html5 = False
 
+        # Checks cookie
+        if not request.supports_html5 and request.COOKIES.get('force_html5', None):
+            request.supports_html5 = True
+
         # Checks GET param
         if request.GET.get('force_html5', False) == '1':
             self.force_html5 = True
@@ -36,10 +40,6 @@ class HTML5Middleware(object):
         elif request.GET.get('force_html5', False) == '0':
             self.force_html5 = False
             request.supports_html5 = False
-
-        # Checks cookie
-        if not request.supports_html5 and request.COOKIES.get('force_html5', None):
-            request.supports_html5 = True
 
         if not request.supports_html5:
             # Google Chrome 3.0 or higher
