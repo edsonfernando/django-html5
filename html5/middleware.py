@@ -10,6 +10,8 @@ EXP_CHROME = re.compile('.* Chrome/(\d)\..*')
 EXP_FIREFOX = re.compile('.* Firefox/(\d\.\d)\..*')
 EXP_SAFARI = re.compile('.*/(\d+\.\d+)[\.\d]* Safari/.*')
 EXP_OPERA = re.compile('^Opera/(\d)\..*')
+EXP_YAHOO = re.compile('.* Yahoo.*')
+EXP_GOOGLEBOT = re.compile('.* GoogleBot.*')
 EXP_IE = re.compile('.* MSIE (\d\.\d).*')
 
 _thread_locals = local()
@@ -59,7 +61,17 @@ class HTML5Middleware(object):
 
             # Opera or higher
             m = EXP_OPERA.match(request.META['HTTP_USER_AGENT'])
-            if m and float(m.group(1)) >= 10:
+            if m and float(m.group(1)) >= 9:
+                request.supports_html5 = True
+
+            # Yahoo! Slurp
+            m = EXP_YAHOO.match(request.META['HTTP_USER_AGENT'])
+            if m:
+                request.supports_html5 = True
+
+            # GoogleBot
+            m = EXP_GOOGLEBOT.match(request.META['HTTP_USER_AGENT'])
+            if m:
                 request.supports_html5 = True
 
         # Stores in thread locals
