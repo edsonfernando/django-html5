@@ -11,7 +11,7 @@ EXP_FIREFOX = re.compile('.* Firefox/(\d\.\d)\..*')
 EXP_SAFARI = re.compile('.*/(\d+\.\d+)[\.\d]* Safari/.*')
 EXP_OPERA = re.compile('^Opera/(\d)\..*')
 EXP_YAHOO = re.compile('.* Yahoo.*')
-EXP_GOOGLEBOT = re.compile('.* GoogleBot.*')
+EXP_GOOGLEBOT = re.compile('.* Googlebot.*')
 EXP_IE = re.compile('.* MSIE (\d\.\d).*')
 
 _thread_locals = local()
