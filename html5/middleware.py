@@ -84,9 +84,13 @@ class HTML5Middleware(object):
         _thread_locals.supports_html5 = request.supports_html5
 
         # Check if current browser is MS Internet Explorer
-        m = EXP_IE.match(user_agent)
-        request.is_ie = bool(m)
-        request.is_bad_ie = bool(m and float(m.group(1)) < 8)
+        if user_agent:
+            m = EXP_IE.match(user_agent)
+            request.is_ie = bool(m)
+            request.is_bad_ie = bool(m and float(m.group(1)) < 8)
+        else:
+            request.is_ie = None
+            request.is_bad_ie = None
 
     def process_response(self, request, response):
         # Stores force HTML5 or force old version
