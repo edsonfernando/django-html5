@@ -13,6 +13,7 @@ EXP_OPERA = re.compile('^Opera/(\d)\..*')
 EXP_YAHOO = re.compile('.* Yahoo.*')
 EXP_GOOGLEBOT = re.compile('.* Googlebot.*')
 EXP_IE = re.compile('.* MSIE (\d\.\d).*')
+PARAM_FORCE_HTML5 = COOKIE_FORCE_HTML5 = 'force_html5'
 
 _thread_locals = local()
 def current_request_supports_html5():
@@ -31,22 +32,24 @@ class HTML5Middleware(object):
         # Default is False
         request.supports_html5 = False
 
-        # Checks cookie
-        if not request.supports_html5 and request.COOKIES.get('force_html5', None):
-            request.supports_html5 = True
-
-        # Checks GET param
-        if request.GET.get('force_html5', False) == '1':
-            self.force_html5 = True
-            request.supports_html5 = True
-        elif request.GET.get('force_html5', False) == '0':
-            self.force_html5 = False
-            request.supports_html5 = False
-
         # Gets user agent (browser notation)
         user_agent = request.META.get('HTTP_USER_AGENT', None)
 
-        if not request.supports_html5 and user_agent:
+        # Checks GET param
+        if request.GET.get(COOKIE_FORCE_HTML5, None) == '1':
+            self.force_html5 = True
+            request.supports_html5 = True
+        elif request.GET.get(COOKIE_FORCE_HTML5, None) == '0':
+            self.force_html5 = False
+            request.supports_html5 = False
+
+        # Checks cookie
+        elif request.COOKIES.get(PARAM_FORCE_HTML5, None) == '1':
+            request.supports_html5 = True
+        elif request.COOKIES.get(PARAM_FORCE_HTML5, None) == '0':
+            request.supports_html5 = False
+
+        elif not request.supports_html5 and user_agent:
             # Google Chrome 3.0 or higher
             m = EXP_CHROME.match(user_agent)
             if m and int(m.group(1)) >= 3:
@@ -88,9 +91,9 @@ class HTML5Middleware(object):
     def process_response(self, request, response):
         # Stores force HTML5 or force old version
         if self.force_html5 == True:
-            response.set_cookie('force_html5', '1')
+            response.set_cookie(COOKIE_FORCE_HTML5, '1')
         elif self.force_html5 == False:
-            response.delete_cookie('force_html5')
+            response.set_cookie(COOKIE_FORCE_HTML5, '0')
 
         return response
 
