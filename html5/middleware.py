@@ -43,34 +43,37 @@ class HTML5Middleware(object):
             self.force_html5 = False
             request.supports_html5 = False
 
-        if not request.supports_html5:
+        # Gets user agent (browser notation)
+        user_agent = request.META.get('HTTP_USER_AGENT', None)
+
+        if not request.supports_html5 and user_agent:
             # Google Chrome 3.0 or higher
-            m = EXP_CHROME.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_CHROME.match(user_agent)
             if m and int(m.group(1)) >= 3:
                 request.supports_html5 = True
 
             # Mozilla Firefox 3.5 or higher
-            m = EXP_FIREFOX.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_FIREFOX.match(user_agent)
             if m and float(m.group(1)) >= 3.5:
                 request.supports_html5 = True
 
             # Apple Safari 4 or higher
-            m = EXP_SAFARI.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_SAFARI.match(user_agent)
             if m and float(m.group(1)) >= 4:
                 request.supports_html5 = True
 
             # Opera or higher
-            m = EXP_OPERA.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_OPERA.match(user_agent)
             if m and float(m.group(1)) >= 9:
                 request.supports_html5 = True
 
             # Yahoo! Slurp
-            m = EXP_YAHOO.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_YAHOO.match(user_agent)
             if m:
                 request.supports_html5 = True
 
             # GoogleBot
-            m = EXP_GOOGLEBOT.match(request.META['HTTP_USER_AGENT'])
+            m = EXP_GOOGLEBOT.match(user_agent)
             if m:
                 request.supports_html5 = True
 
@@ -78,7 +81,7 @@ class HTML5Middleware(object):
         _thread_locals.supports_html5 = request.supports_html5
 
         # Check if current browser is MS Internet Explorer
-        m = EXP_IE.match(request.META['HTTP_USER_AGENT'])
+        m = EXP_IE.match(user_agent)
         request.is_ie = bool(m)
         request.is_bad_ie = bool(m and float(m.group(1)) < 8)
 
