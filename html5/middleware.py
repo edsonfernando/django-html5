@@ -26,7 +26,7 @@ class HTML5Middleware(object):
     
     Only browsers with 70% or more set True to that attribute."""
 
-    force_html5 = None
+    force_html5 = getattr(settings, 'FORCE_HTML5', None)
 
     def process_request(self, request):
         # Default is False
@@ -40,7 +40,7 @@ class HTML5Middleware(object):
             self.force_html5 = True
             request.supports_html5 = True
         elif request.GET.get(COOKIE_FORCE_HTML5, None) == '0':
-            self.force_html5 = False
+            self.force_html5 = getattr(settings, 'FORCE_HTML5', None) or False
             request.supports_html5 = False
 
         # Checks cookie
@@ -94,10 +94,11 @@ class HTML5Middleware(object):
 
     def process_response(self, request, response):
         # Stores force HTML5 or force old version
-        if self.force_html5 == True:
-            response.set_cookie(COOKIE_FORCE_HTML5, '1')
-        elif self.force_html5 == False:
-            response.set_cookie(COOKIE_FORCE_HTML5, '0')
+        if not getattr(settings, 'FORCE_HTML5', None):
+            if self.force_html5 == True:
+                response.set_cookie(COOKIE_FORCE_HTML5, '1')
+            elif self.force_html5 == False:
+                response.set_cookie(COOKIE_FORCE_HTML5, '0')
 
         return response
 
